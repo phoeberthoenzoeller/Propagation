@@ -1,0 +1,2 @@
+All data in ALLTXT is obtained from the WSJTX messages.  Some of it is derivative.  See DatadDerived.txt.
+

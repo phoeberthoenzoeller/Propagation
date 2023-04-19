@@ -1,0 +1,5 @@
+Program Propagation is intended to show realtime propagation characteristics.
+The goal is to indicate with whom you can likely communicate.
+While there are many extremely valuable resources for propagation reporting and prediction available to Ham radio operators, those resources do not reflect conditions at your QTH, with your antenna, and your transceiver.
+This program seeks to show propagation for you in your unique circumstances.
+It takes realtime signal data from WSJT-X and static data from callsign databases and builds a local database of messages received.  The message data is used to show geographically the source and strength of those messages.  The theory is that you can most likely work those people that you can hear.  Ancillary to this purpose a log is kept of received messages.  That data is an elaboration on the data found in ALL.TXT.  The mapping output is currently crude and incomplete.  If anyong with GIS in Java expertise wants to help out in that arena then that would be great.

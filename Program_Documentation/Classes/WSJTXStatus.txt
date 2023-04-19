@@ -1,0 +1,70 @@
+WSJTXStatus is instantiated by UDPThreadManager.startThreads() and disposed() by UDPThreadManager.endThreads()
+
+Field population:
+Queue Size: jTextFieldQueueSize.  Set by UDPThreadManager state 10 from bufferVector.size().
+
+Last Heartbeat: jTextFieldHeartbeat.  Set by UDPThreadManager state 10 
+  via jTextFieldHeartbeat.setText(this.serverWorker.dtNowString).  
+  UDPServerWorker.dtNowString is set in state=30 from current datetime.
+
+Messages Received: jTextFieldMessReceived.  Set in UDPThreadManager state=10.
+  jTextFieldMessReceived.setText(df.format(this.serverWorker.messageReceiveCnt)).
+  messageReceiveCnt is incremented in state=30 of UDPServerWorker upon receipt of a valid message.
+
+Messages Processed: jTextFieldMessProcessed. Set in UDPThreadManager state=10.
+  jTextFieldMessProcessed.setText(df.format(this.processMessageThread.messagesProcessed)).
+  messagesProcessed is incremented in UDPProcessMessageThread state=20 upon writing to database the new Alltxt record.
+
+New Callsign Records: jTextFieldNewCallsignRecords. Set in UDPThreadManager state=10.
+  jTextFieldNewCallsignRecords.setText(df.format(this.processMessageThread.popAlltxtObj.callsignnew)).
+  callsignnew is incremented in PopulateAlltxt.createUpdateCallmaid() in response to now rows returned
+  in query of CALLMAID for callsign in MessageRecord.
+
+Updated Callsign Records: jTextFieldUpdatedCallsignRecs. Set in UDPThreadManager state=10.
+  jTextFieldNewCallsignRecords.setText(df.format(this.processMessageThread.popAlltxtObj.callsignnew)).
+  callsignnew is incremented in PopulateAlltxt.createUpdateCallmaid() in response to existing row returned
+  in query of CALLMAID for callsign in MessageRecord.
+
+
+Online Queries: jTextFieldOnlineQueries.  Set in UDPThreadManager state=10. This is the total of
+  PopulateCallmaidHamQTH.hamqthqueries and QRZCQ.queriestotal.
+  hamqthqueries is incremented in PopulateCallmaidHamQTH.hamQTHToCallmaid().  This method is invoked from
+  UDPProcessMessageThread state=25.  That state is entered from state=20 if qthrealtime==true && PopulateAlltxt.callcreateflag==true
+  callcreateFlag is set in createUpdateCallmaid() when a CALLMAID record for the callsign is not found and thus created from
+  Alltxt data.  callcreateflag is also set wherein there is an existing callmaid record and one of the following two criteria 
+  are met:
+  1) qthstatus == 'N' && elapseddays > 360. That is CALLMAID.DS[2]='N' and number of days since CALLMAID.mdate > 360.  
+     If modification date is null then elapseddays=365.
+  2) qthstatus == 'F' || qthstatus == '0'.  That is CALLMAID.DS[2]='F' or '0'.
+  ds[2] indicates whether populated by HamQTH. ds[2]="T" true, record was updated from HamQTH, 
+  ds[2]="F", record was not updated from HamQTH, 
+  ds[2]="N" null, no record found in HamQTH.
+  ds[2=="0" indicates a record prior to utilization of HamQTH.
+  Notice that at this time code has not been included in QRZCQ to update CALLMAID.DS.
+  jTextFieldOnlineQueries.setText(df.format(this.processMessageThread.pophamqthObj.hamqthqueries + this.processMessageThread.qrzcqObj.queriestotal)).
+  hamqthqueries is incremented in PopulateCallmaidHamQTH.hamqthToCallmaid() at beginning of method
+  so that the query can fail and hamqthqueries will still increment.
+  qrzcqObj.queriestotal is incremented at beginning of QRZCQ.QRZCQToCallmaid().
+  
+
+Online Responses: jTextFieldOnlineResponses. Set in UDPThreadManager state=10.
+  jTextFieldOnlineResponses.setText(df.format(this.processMessageThread.pophamqthObj.hamqthreads + this.processMessageThread.qrzcqObj.queryresponses)).
+  hamqthreads is incremented in PopulateCallmaidHamQTH.hamqthToCallmaid() upon successful
+  read from hamqth api and update of table CALLMAID.
+  qrzcqObj.queryresponses is incremented in QRZCQ.QRZCQToCallmaid() upon response from qrzcq.com.
+
+Scrolling table of eligible QSOs jTableEligibleQSOs.
+column	description	source
+0		callsign		messRec.sourceCallsign.  If(worked) then color red.
+1		maidenhead		messRec.sourceMaidenhead
+2		RSS			messRec.rssi
+3		Contest		messRec.contestIdentifier
+4		Worked		UDPServerWorker.beenWorked(messRec.sourceCallsign)
+5		Watch			
+6		TimeElapsed	elapsed time initially set to 0.
+7		TimeStart		currtime
+8		Color			color of column 0
+9		MessageRec		this.messRec.
+New rows are inserted via WSJTXStatus.insertRow(Object[] rowdata).
+insertRow is called from UDPServerWorker.insertCQRow()
+if(!debuglag) columns 7,8,9 have width set to 0 to hide them.

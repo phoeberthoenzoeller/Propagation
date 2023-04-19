@@ -1,0 +1,43 @@
+Table ALLTXT:
+  Write. ReadWSJTXFile.parseFile().via Propdbutils.submitAllTxtDatabase().
+  Delete. Init.constructor via Propdbutils.autodelete().
+
+Table CALLMAID:
+  See file callmaid.txt.
+
+Table CONTESTIDENTIFIER:
+  Read. UIMain.jMenuItemEditIdentifiersActionPerformed().
+
+Table COUNTRYABBR:
+  Read. UIMain.jMenuItemEditCountryabbrActionPerformed().
+
+Table COUNTRYGEO:
+  Read. UIMain.jMenuItemEditCountrygeoActionPerformed().
+
+Table CALLSIGNPREFIXES.
+  Read. UIMain.jMenuItemEditCallsignprefixActionPerformed().
+  Read. UIMain.jMenuItemExportPrefixesActionPerformed().
+  Read. Propdbutils.constructor via Propdbutils.callprefixToLatLonHashmap()
+
+Table STATES.
+  Read. TableEditCallmaid.jTable1MouseClicked()
+
+Table ZIPCODEGEO:
+  Write.  Zipcodegeo.parseFile() via Propdbutils.insertZipcodegeo().
+  Read.  via Propdbutil.queryZipcodegeo().  Called by:
+    PopulateCallmaidMaidenhead.popcallmaid2().
+    PopulateCallmaidMaidenhead.queryZipcodegeo().
+
+All tables:
+  dbAllTxt.commit() in ReadWSJTXFile.parseFile().
+  dbAllTxt.DB_finalize() in UIMain.finalize().
+  dbl.commit() in TableEditGeneric.ButtonCommitActionPerformed().
+  Read.  Propdbutils.totalRecordsInTable().
+  Read.  Propdbutils.queryGeneric().
+  Read.  Propdbutils.recordIsUnique().
+Undefined table:
+  Read. DisplayTables.queryTable(), performQuery().  To display any table.
+  Read. TableEditGeneric.displayQueryResults().
+  Read. ExportToTextFileResultSet.
+  Delete.  TableEditGeneric.deleteRow().
+  TableEditGeneric is called to edit CONTESTIDENTIFIER, COUNTRYABBR, COUNTRYGEO, CALLSIGNPREFIXES from UIMain.

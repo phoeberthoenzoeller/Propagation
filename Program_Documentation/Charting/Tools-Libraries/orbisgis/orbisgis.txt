@@ -1,0 +1,5 @@
+Downloaded orbisgis-5.1.0-SNAPSHOT-2019-09-10.
+Ran the provided bat files and also the .jar with jdk19.
+All failed.
+Exception in thread "main" java.lang.StringIndexOutOfBoundsException: Index 2 out of bounds for length 2
+Providing command line arguments didn't change the error.

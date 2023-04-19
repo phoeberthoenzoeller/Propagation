@@ -1,0 +1,23 @@
+SwitchAdmin/Sensors classes:
+c.PlotSensorResults:
+  plotResults() Given a String[][] from sensor database query, 
+    calls this.plotChart("Sensor record", sensorTypeString + " over Time", sensorName, this.xArrayTarget, this.yArrayTarget, "Time", sensorTypeString);
+  plotChart() creates the JFreeChart and adds the series.  Creates Sensors.v.Charting.ChartTimeSeries and adds series.
+    Sensors.c.Charting.ChartTimeSeries:
+      This class utilizes the default TimeSeriesChart Chart class via ChartFactory.createTimeSeriesChart().
+      The dataset is TimeSeriesCollection, implements XYDataset.
+      The series is TimeSeries.
+
+UIMain.jButtonComputeAdjustActionPerformed() // compare sensor to reference and compute adjustment. Creates PlotSensorResults.
+  c.PlotSensorResults:
+    plotChart(), addSeries.  // this plots adjusted values and compensation values as time series.
+  Sensors.v.Charting.XYLinechart: addSeries(). // plots the adjustment functions.
+  * XY line chart with XYSeriesCollection (implementation of interface XYDataset)
+  * An XYSeriesCollection is populated with one or more XYSeries.
+  * An XYSeries is populated with double, Number, or XYDataItem elements.
+  * XYDataItems are comprised of double or Number elements.
+  * Thus this graph is comprised of numeric x and y values.
+  * If height or width passed to constructor are zero then height and width will be set to 95% of screen height and 99% of screen width.
+  * Preset line renderer values are defined for a maximum of three Series.  Add to this.customizeChart to include further Series.
+
+  

@@ -1,0 +1,50 @@
+The User-friendly Desktop Internet GIS (uDig) is both a GeoSpatial application and a platform 
+through which developers can create new, derived applications. uDig is a core element in an 
+internet aware Geographic Information System. uDig has been developed with a strong emphasis 
+on supporting the public standards being developed by the Open Geospatial Consortium, 
+and with a special focus on the Web Map Server and Web Feature Server standards.
+
+URL: http://udig.refractions.net/
+
+Downloaded udig-2.0.0.win32.win32.x_86-64
+Provided jdk19 in directory jre
+run udig.bat on chascheryl.
+
+Failed with following in log:
+!SESSION 2023-03-23 22:09:00.968 -----------------------------------------------
+eclipse.buildId=unknown
+java.version=19
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en_US
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.osgi 4 0 2023-03-23 22:09:04.177
+!MESSAGE Application error
+!STACK 1
+java.lang.ExceptionInInitializerError
+	at org.locationtech.udig.libs.internal.Activator.doEpsg(Activator.java:274)
+	at org.locationtech.udig.libs.internal.Activator.epsgDatabaseFile(Activator.java:259)
+	at org.locationtech.udig.internal.ui.UDIGApplication.init(UDIGApplication.java:168)
+	at org.locationtech.udig.internal.ui.UDIGApplication.start(UDIGApplication.java:126)
+	at org.eclipse.equinox.internal.app.EclipseAppHandle.run(EclipseAppHandle.java:196)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.runApplication(EclipseAppLauncher.java:134)
+	at org.eclipse.core.runtime.internal.adaptor.EclipseAppLauncher.start(EclipseAppLauncher.java:104)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:388)
+	at org.eclipse.core.runtime.adaptor.EclipseStarter.run(EclipseStarter.java:243)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:578)
+	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:653)
+	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:590)
+	at org.eclipse.equinox.launcher.Main.run(Main.java:1499)
+Caused by: java.lang.IllegalArgumentException: org.geotools.styling.StyleFactory is not an ImageIO SPI class
+	at java.desktop/javax.imageio.spi.ServiceRegistry.checkClassAllowed(ServiceRegistry.java:711)
+	at java.desktop/javax.imageio.spi.ServiceRegistry.<init>(ServiceRegistry.java:116)
+	at org.geotools.factory.FactoryRegistry.<init>(FactoryRegistry.java:155)
+	at org.geotools.factory.FactoryCreator.<init>(FactoryCreator.java:91)
+	at org.geotools.factory.CommonFactoryFinder.getServiceRegistry(CommonFactoryFinder.java:76)
+	at org.geotools.factory.CommonFactoryFinder.lookup(CommonFactoryFinder.java:346)
+	at org.geotools.factory.CommonFactoryFinder.getFilterFactory(CommonFactoryFinder.java:300)
+	at org.geotools.factory.CommonFactoryFinder.getFilterFactory2(CommonFactoryFinder.java:390)
+	at org.geotools.factory.CommonFactoryFinder.getFilterFactory2(CommonFactoryFinder.java:404)
+	at org.geotools.data.DataUtilities.<clinit>(DataUtilities.java:204)
+	... 14 more

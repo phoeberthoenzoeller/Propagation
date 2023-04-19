@@ -1,0 +1,4 @@
+URL: openjump.org
+Supports: shapefiles, simple GML files, other vector files.
+Dependencies: JTS
+Development: Last stable release 12/2022

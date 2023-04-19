@@ -1,0 +1,46 @@
+Overview: Populate columns maidenhead, cq, and itu in table callmaid.
+These fields are not provided by EN.DAT file from FCC.
+Also, many records from EN.DAT have null or erroneous zipcodes.
+There are about 15000 records in EN.DAT with null or erroneous zipcodes as of 12/01/22.
+The query "select count(*) from callmaid where (zipcode = 0 or lastname = '' or firstname = '' or city = '') and country = 'US'" returned 41,723 rows.
+lastname was '' in 29,679 rows, firstname in 29.683 rows state in 16,209, and city in 16,209.
+In order to obtain zipcodes for these records we utilize an API at HamQTH.com.
+
+UIMain.jMenuItemPopCallmaidActionPerformed() performs the following:
+a) new PopulateCallmaidHamQTH().
+b) new PopulateCallmaidMaidenhead();//populate callmaid.maidenhead given callmaid.zipcode.
+c) new PopulateCallmaidCQITU(). // populate CQ and ITU for USA from state.
+
+PopulateCallMaidenhead:
+The purpose of this class is to populate callmaid.maidenhead given callmaid.zipcode which was provided from FCC database via UIMain.jMenuItemPopCallmaidActionPerformed.
+Only null maidenhead records are populated.
+Table zipcodegeo provides link from zipcode to lat/lon.
+The original callmaid table contents were loaded from EN.dat by class ReadEntityFile.
+1) Get all maidenhead records with null maidenhead.  i.e. select * from callmaid where where maidenhead = ''
+2) If callmaid.maidenhead is not null then return to 1)
+3) Read callmaid.zipcode.
+4) Query zipcodegeo where zipcodegeo.zipcode = callmaid.zipcode. Get latitude and longitude
+5) If zipcodegeo not found then return to 1)
+6) Convert zipcodegeo.latitude/longitude to maidenhead using Maidenhead.latLonToMaiden()
+7) Update callmaid.maidenhead with result of latLonToMaiden()
+Invoked from UIMain.jMenuItemPopCallmaidActionPerformed().
+
+
+
+PopulateCallmaidCQITU.popCallmaid():
+1) Get all maidenhead records with null CQ or ITU.
+2) For each such record call this.popcqitu().
+3) Report results to user.
+
+popcqitu():
+1) Country abbreviation is obtained from current record.
+2) this.getZip() is called to obtain zipcode from current record.
+3) this.getCallsign() is called to obtain callsign from current record.
+4) If country = 'US' then call this.USStateToCQITU() to obtain CQ and ITU.  Else return to caller.
+5) Update the callmaid record for this callsign with the CQ and ITU values.
+
+this.USStateToCQITU():
+Based on state abbreviation assign CQ and ITU.
+Some states are in two ITU zones, differentiated by longitude.
+We get longitude from zipcode.
+

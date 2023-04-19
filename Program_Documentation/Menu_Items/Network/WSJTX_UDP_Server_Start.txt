@@ -1,0 +1,23 @@
+MessageRecord: This class contains a superset of the columns in table ALLTXT and is produced in order to populate a row in that table.
+
+UIMain.jMenuItemWSJTXUDPServerStartActionPerformed() instantiates c.SwingWorkerWSJTX().
+
+SwingWorkerWSJTX:
+Creates v.WSJTXStatus to display status of UDP Server.
+Creates new Vector<MessageRecord> to hold MessageRecord objects between reception and processing.
+Creates Thread UDP.UDPServerThread and starts it.
+Creates Thread UDP.UDPProcessMessageThread and starts it.
+
+UDPServerThread:  State machine.
+Creates UDP.UDPWSJTX.
+  State 10: udpwsjtx.udps.receive() to get data from client
+  State 20: udpwsjtx.parseMessage(bin) to parse message from WSJTX, create MessageRecord.
+  State 30: Get the message via udpwsjtx.getMessageRec().  Add it to buffer via bufferVector.add(messRec).
+
+UDPProcessMessageThread: State machine.
+  State 0: Create  new PopulateAlltxt()
+  State 10:  this.bufferVector.get(0);  // pop the first element off the Vector
+  State 20: Process MessageRecord via popAlltxtObj.processMessageRecord(messRec).  This is where the heavy lifting is done.
+               See file PopAlltxt.txt for details.
+            Write ALLTXT/UDP message to database via .popAlltxtObj.writeToDatabase(messRec).
+  State 30: Remove message from vector. .bufferVector.remove(0).

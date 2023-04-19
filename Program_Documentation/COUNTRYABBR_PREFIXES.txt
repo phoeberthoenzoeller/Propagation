@@ -1,0 +1,38 @@
+Country abbreviations/names are two character abbreviations.
+There is not wide agreement on what constitutes a country.
+The Netherland Antilles disolved, but some of the the islands remained with Holland, some as countries, som not.
+Many on the list are not independent countries but rather protectorates, possessions,
+territory(american samoa), country within a kingdom(aruba), autonomous region(Aland islands),
+oversees collectivity(Saint Barthelemy), dependency(Bouvet Island), 
+external territoy(Cocos (Keeling) Islands, Christmas Island),
+external sovereignty(Faroe Islands), British Crown Dependency(Guernsey),
+United States Minor Outlying Islands(Wake Island),
+etc.
+
+Remember that for every entry added to COUNTRYABBR then there must be an entry
+in COUNTRYGEO with the lat/lon for that country abbreviation.
+You must also map CALLSIGNPREFIXES.COUNTRYCODE to COUNTRYABBR.ABBR.
+
+Apart from the liberties that others have taken with the definition of "country" I have 
+added a few "places" that might be of interest to amateur radio operators.
+Since no official country abbreviations, i.e. COUNTRYABBR.ABBR, include numeric characters
+I use them for placenames abbreviations.  These have not yet been entered.
+CALLSIGNPREFIXES	COUNTRYABBR		COUNTRYGEO
+PREFIX		ABBR: NAME			LATITUDE: LONGITUDE
+AH0			U1: Mariana Islands.  15.075: 145.658
+AH2,KH2		U2: Guam			13.461: 144.767
+AH6,AH7,NH6,WH6	U3: Hawaii			20.895: -156.703
+AH8,KH8,NH8,WH8	AS: American Samoa	extant
+AH9			U4: Wake Island		19.281: 166.649
+E5			N1: Cook Islands, New Zealand -21.239: -159.777
+E6			N2: Nieu, New Zealand -19.035: -169.858
+
+Added 11/15/22
+D1,1C		R1: Donetsk Peoples Republic, Ukraine 48.030: 37.808  It has been reported that Donetsk also has used D2 prefix, but that is assigned to Angola
+1A			MT: Malta (extant)
+
+
+Prefixes to never use:
+1B is used by the Turkish Republic of Northern Cyprus, a de facto country recognized internationally only by Turkey, 
+as such this has not been allocated by the ITU. Contact with 1B stations can lead to revocation of amateur operators' 
+licenses outside the northern Cyprus.

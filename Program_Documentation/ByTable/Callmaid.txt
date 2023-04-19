@@ -1,0 +1,194 @@
+Overview: Callmaid is typically populated via attributes in class m.CallmaidRecord object.
+
+Changes 01/10/23: Added qsodate, crdate, ds(varchar 3). 
+  ds[0] identifies source of base callmaid record, "1" for initial data load from FCC, "2" for HamQTH, "3" for WSJTX, "4" for user edit.
+  ds[1] specifies source of maidenhead.
+  ds[2] indicates whether populated by HamQTH. ds[2]="T" true, record was updated from HamQTH, ds[2]="F", record was not updated from HamQTH, ds[2]="N" null, no record found in HamQTH.
+  ds[0]="1". ds[1]="1" id updating existing record ds[1]="0" if new record. For FCC record via EN.DAT.
+  ds[1]="1" for all records processed by PopulateCallmaidMaidenhead.  PopulateCallmaidCQITU does not update ds[].
+  ds[0,1]="2" if PopulateCallmaidHamQTH.
+    If no HamQTH is found then set callmaid.ds[2]="F", update mdate and continue loop.
+    If existing callmaid.DS is null then assign "11F".
+    if ds[1] < "3", i.e. if maidenhead was not populated by WSJTX or user, then overwrite maidenhead and set ds[1]="2"
+    If updating callmaid set ds[0]="2", ds[2]="T".
+  ds[1]="3" if WSJTX message.  If new callmaid then ds[0]="1", else leave ds[0] unchanged.  Always leave ds[2] unchanged.
+  ds[0/1]="4" if via user record edit.
+  
+
+  b) If maidenhead was updated from source other than user then update all data except maidenhead. i.e. if ds[0]!="4" then update callmaid, set ds[0]="1".
+     callmaid record is updated from CallmaidRecord only wherein CallmaidRecord values are not null.
+  c) if ds[1]!="1" and ds[1]!="" then don't update maidenhead, else update maidenhead.
+  
+  
+*CallmaidRecord is instantiated by; 
+*  HTTP.PopulateCallmaidHamQTH.hamqthToCallmaid().  Called from UIMain.jMenuItemTestHTTPGetActionPerformed(). Updates callmaid with data from HamQTH.
+   a) Queries callmaid via Propdbutils.queryCallmaid().
+   b) Creates a new CallmaidRecord with existing callmaid data.
+  
+
+
+  m.Prodbutils{insertUpdateCallmaiden(), insertUpdateCallmaiden()}
+  m.ReadEntityFile.parseFields(),
+  v.TableEditCallmaid.jButtonSaveActionPerformed().
+
+Classes that access table Callmaid:
+  A) ReadEntityFile. Reads from EN.DAT FCC file and populates callmaid.  There is no maidenhead in EN.DAT. Invoked via menu entry Admin/Read Entity File.
+    a) method parseFile() calls Prodbutils.insertUpdateCallmaidRecord().
+    b) method parseFields() creates callmaidRecordObj for parseFile().
+    From a DS[] perspective this constitutes a ds[0] reset inasmuch as ReadEntityFile always sets d[0] to "1". ds[1] is set to "0".
+    As expanded upon below: ds[0] is always set to '1'. ds[1] is set to [1] for new callmaid record.   if(ds2=='0' || ds2=='1') set ds[2] to 'F'.
+    1) If callmaid.callsign not found then create callmaid.  Set ds[0]="1", ds[1]="0", ds[2]="F".
+    2) If callmaid.callsign is found then update existing record. Set ds[0]="1", ds[1]="0". Preserve ds[2] unless it is '0' or '1' in which case set to "F".
+       ds[1] is set to "0" as a flag to PopulateCallmaidMaidenhead.
+
+  B) jMenuItemPopCallmaidActionPerformed(). Invoked via menu entry Admin/Populate Callmaid US. Populates callmaid.maidenhead, CQ, ITU. Calls the following:
+    a) PopulateCallmaidMaidenhead() to populate callmaid.maidenhead given callmaid.zipcode.
+       Only null maidenhead records are populated.
+       Table zipcodegeo provides link from zipcode to lat/lon.
+       The original callmaid table contents were loaded from EN.dat by class ReadEntityFile.
+       1) Get all callmaid records with null maidenhead.  i.e. select * from callmaid where where maidenhead = ''
+       2) If callmaid.maidenhead is not null then return to 1)
+       3) Read callmaid.zipcode.
+       4) Query zipcodegeo where zipcodegeo.zipcode = callmaid.zipcode. Get latitude and longitude
+       5) If zipcodegeo not found then return to 1)
+       6) Convert zipcodegeo.latitude/longitude to maidenhead using Maidenhead.latLonToMaiden()
+       7) Update callmaid.maidenhead with result of latLonToMaiden()
+       8) Set DS[1] to "1", update mdate.
+    b) PopulateCallmaidCQITU() to populate callmaid cq and itu wherein cq and itu are not already populated and country = 'US'. Does not update maidenhead.
+
+
+  C) PopulateCallmaidHamQTH:  Populate table callmaid with HamQTH data.
+     For all records specified in whereClause:
+     Query HamQTH API, populate HamQTH.hamqthEntity object, populate CallmaidRecord object with hamqthEntity object.
+     The API documentation states that I may make "unlimited" queries, but in order
+     to mitigate impact on the server and network I limit queries on hamqth to 
+     one per second. 
+       a) Populate table callmaid with HamQTH data.  method hamqthToCallmaid() is the public entry point.
+       b) Create a new CallmaidRecord with existing callmaid record contents.
+       c) Call HamQTH.hamQTHXMLAPI(callsign) to create a HamQTH.hamqthEntity.
+          This method performs a get of XML at HamQTH server, parses the XML, and assigns fields to a hamqthEntity object.
+          The hamqthEntity object is returned to hamqthToCallmaid() for processing.
+       d) If no HamQTH is found then set callmaid.ds[2]="F", update mdate and continue loop.
+       e) Call this.updateCallmaid() to update callmaid record from step (b) with data from HamQTH.hamqthEntity object.
+          Update CallmaidRecord object with hamqtyEntity object.
+          if ds[1] < "3", i.e. if maidenhead was not populated by WSJTX or user, then overwrite maidenhead and set ds[1]="2"
+          Always set ds[0]="2", ds[2]="T".
+       f) Pause for 700 msec.
+
+  D) PopulateAlltxt. Used by UDPProcessMessageThread, UDPWSJTX, and ReadWSJTXFile to process a message from WSTX.
+    UDPWSJTX uses PopulateAlltxt.createMessageRecord() to create a new MessageRecord object representing the contents of a WSJTX message.
+    ReadWSJTXFile uses PopulateAlltxt to process the MessageRecord.
+    UDPProcessMessageThread uses PopulateAlltxt.processMessageRecord() and writeToDatabase().  The MessageRecord is passed from UDPServerThread.
+    a) The PopulateAlltxt.processMessageRecord() method creates a CALLMAID record for the source callsign in the message if it does not already exist therein.
+       It uses this.createUpdateCallmaid(). 
+       Some detail on processMessageRecord():
+       Called by: ReadWSJTXFile.parseFile(), UDPProcessMessageThread state=20.
+       Tread carefully here.  This is a complex method.
+       1) Call this.maidFromCallsign() to obtain the maidenhead from the source's callsign and assign to MessageRecord.
+       Returns boolean prefixMaiden indicating whether the maidenhead was assigned from source callsign prefix.
+       prefixMaiden is true if maidenhead was assigned from source callsign prefix. and is false if obtained if obtained from callmaid.
+       2) Call Propdbutils.callsignToCountrycode() to obtain country from callsign.
+       3) Call this.createUpdateCallmaid() to:
+         a) If sourceCallsign or sourceMaidenhead are null then return without action.
+         b) If there is no callmaid record then create it.  
+         c) If there is a callmaid then update it if prefixMaiden=false.
+            prefixMaiden is true if maidenhead was assigned from callsign prefix.
+         The assumption is that the licensee provided maidenhead preponderates over that provided by the FCC database or approximation from country code.
+       4) Call createUpdateCallmaid() to populate callmaid with callsign and maidenhead.
+       5) Call AlltxtUtils.calculateBearingDistance() to assign bearing and distance in ALLTXT record.
+    b) maidFromCallsign().   The goal here is to obtain the maidenheads of the caller callsign and respondent callsign when it is not 
+       obtained from the message. Then assign sourceMaiden from either callerMaiden or respondentMaiden depending on value of sourceIs.
+       All in four easy steps.
+       To obtain current maidenhead we use Prodbutils.
+    c) createUpdateCallmaid().  It is the sourceCallsign/sourceMaidenhead whose CALLMAID record will be created or updated.
+       Prodbutils.queryCallmaid() is utilized to get the maidenhead, country of current callmaid record.
+       Prodbutil.insertUpdateCallmaid() is used to write the changes(or new record) to callmaid.
+
+
+
+
+
+
+  2) CallmaidUtils:  This class is described as a class which provides methods for populating and modifying contents of table CALLMAID
+    It is utilized by ReadWSJTXFile.  In reality it has one method queryZipcodegeo() which queries table zipcodegeo.
+    No callmaid table access is made.
+
+  
+  
+
+  Write. PopulateCallmaidMaidenhead.popcallmaid2(). Updates maidenhead column only.
+  Write. TableEditCallmaid.jButtonSaveActionPerformed() via Propdbutils.insertUpdateCallmaidRecord(). If callmaid.callsign exists then update, else insert record.
+  Read/Write/Update. ReadEntityFile.parseFile() via Propdbutils.insertUpdateCallmaidRecord().  Create new record or if record with matching callmaid.callsign exists then update it.
+           // current code in ReadWSJTX.parseFields() calls insertUpdateCallmaid() with update flag set always.
+  Read/Write/Update. ReadWSJTXFile.parseFields() via Propdbutils.insertUpdateCallmaid().  * Always create a new record.  Update existing record only if updateEnabled is true.
+  Update.  TableEditCallmaid.jButtonSaveActionPerformed() via Propdbutils.updateCallmaidRecord().
+  Read.  Propdbutils.queryCallmaid().  Called by:
+    PopulateCallmaidMaidenhead.popCallmaid().
+    ReadWSJTX.createUpdateCallmaid().
+  Read.  Propdbutils.queryCallmaidCallsign().  Called by:
+    ReadWSJTX.getCallerMaiden().
+    ReadWSJTX.getRespondentMaiden().    
+  Read. TableEditCallmaid.queryRefresh().
+  Delete. TableEditCallmaid.deleteRow().
+
+
+
+
+
+
+
+
+
+
+Data population priorities:
+callsign: Sources are FCC(EN.DAT), HamQTH, WSJTX messages.  Priority is first to populate.
+maidenhead: Sources are FCC(derived), HamQTH, WSJTX messages.  Priority is WSJTX.
+country: In createUpdateCallmaid() we assign a countrycode from callsign prefix unless callmaid.country is already assigned.
+   The priority then is a preexisting countrycode.
+All other columns: Priority is most recent data except that FCC data has a higher priority than HamQTH for U.S. hams.
+See class PopulateAlltxt.java for details.
+
+
+
+
+Derived data:
+Populate callmaid.maidenhead from callmaid.zipcode in class PopulateCallmaidMaidenhead.
+The main menu item "Populate Callmaid" creates PopulateCallmaidMaidenhead.
+The purpose of this class is to populate callmaid.maidenhead given callmaid.zipcode which was provided from FCC database via UIMain.jMenuItemPopCallmaidActionPerformed
+Table zipcodegeo provides link from zipcode to lat/lon.
+The original callmaid table contents were loaded from EN.dat by class ReadEntityFile.
+1) Get all maidenhead records with null maidenhead.  i.e. select * from callmaid where where maidenhead = ''
+2) If callmaid.maidenhead is not null then return to 1)
+3) Read callmaid.zipcode.
+4) Query zipcodegeo where zipcodegeo.zipcode = callmaid.zipcode. Get latitude and longitude
+5) If zipcodegeo not found then return to 1)
+6) Convert zipcodegeo.latitude/longitude to maidenhead using Maidenhead.latLonToMaiden()
+7) Update callmaid.maidenhead with result of latLonToMaiden()
+Todo: Not all records from the FCC include a valid zipcode.  You might try to map the remaining records by reverse geocoding the address.
+
+
+Populate ALLTXT.maidenhead from CALLMAID.maidenhead or ALLTXT.callsign in class ReadWSJTX.
+The primary source is from the WSJTX message.
+If callerCallsign is populated and callerMaiden is not; i.e.
+if(atrec.callerMaiden==null && atrec.callerCallsign != null && !atrec.callerCallsign.equals("") && !atrec.callerCallsign.equals("..."))
+then obtain callerMaiden from CALLMAID via callerCallsign.  If CALLMAID does not provide callerMaiden
+then get lat/lon from callerCallsign and use this to obtain callerMaiden.
+Similarly for CALLMAID.respondentMaiden, attempt to get maidenhead from CALLMAID table, else derive from respondentCallsign.
+
+Populate CALLMAID.COUNTRY in ReadEntityFile.  All records from the FCC database are for US licensees, and so country is always "US" in call to CallmaidRecord constructor.
+
+Populate CALLMAID.CQ and CALLMAID.ITU
+
+
+Calls to Propdbutils.insertUpdateCallmaidRecord():
+  HTTP.PopulateCallmaidHamQTH.updateCallmaid().  prodb.insertUpdateCallmaidRecord(CallmaidRecord,"N");
+  m.ReadEntityFile.parseFile(). prodb.insertUpdateCallmaidRecord(CallmaidRecord,"U").
+  v.TableEditCallmaid.jButtonSaveActionPerformed().  prodb.insertUpdateCallmaidRecord(CallmaidRecord,"U");
+  m.Propdbutils.insertUpdateCallmaiden(String callsign, String maidenhead).  this.insertUpdateCallmaidRecord(CallmaidRecord, "U").
+  m.Propdbutils.insertUpdateCallmaiden(String callsign, String maidenhead, String countryCode).   this.insertUpdateCallmaidRecord(CallmaidRecord, "U").
+
+Calls to Propdbutils.insertUpdateCallmaiden(callsign,maidenhead,country)
+  m.PopulateAlltxt.createUpdateCallmaid().
+
+Calls to Propdbutils.insertUpdateCallmaiden(callsign,maidenhead)
+  None.

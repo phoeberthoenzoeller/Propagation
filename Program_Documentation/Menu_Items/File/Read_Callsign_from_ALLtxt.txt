@@ -1,0 +1,2 @@
+Read Callsign from Alltxt is identical to Read All from Alltxt except that the read
+of ALL.TXT is constrained to records including the user's callsign.

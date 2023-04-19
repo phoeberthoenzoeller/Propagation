@@ -1,0 +1,9 @@
+Overview: Initiate network interface to instance of WSJT-X.  
+Log records will be received via this interface.
+That instance of WSJT-X must have the "UDP Server" set to the receiving computer
+that is running Propagation.
+
+Workflow:
+UIMain.jMenuItemWSJTXUDPActionPerformed() instantiates UDPWSJTX.
+The constructor invokes this.serverInit() which creates a UDPSocket for server at specified address.
+It then calls this.serverListen().

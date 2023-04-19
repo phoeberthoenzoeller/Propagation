@@ -1,0 +1,12 @@
+Socket s;
+try {
+    s = new Socket(URL, 1987);
+
+    PrintWriter output = new PrintWriter(s.getOutputStream(), true);
+    InputStreamReader inp = new InputStreamReader(s.getInputStream(), Charset.forName("UTF-8"));
+    BufferedReader rd = new BufferedReader( inp );
+
+    String st;
+    while ((st = rd.readLine()) != null){
+        System.out.println(st);
+    }...

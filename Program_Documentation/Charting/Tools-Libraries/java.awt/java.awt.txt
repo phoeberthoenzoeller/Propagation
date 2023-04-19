@@ -1,0 +1,2 @@
+The packages java.awt.event.*, java.awt.geom.*, java.awt.image.BufferedImage
+provide the resources for the Netbeans project "Worldmap".

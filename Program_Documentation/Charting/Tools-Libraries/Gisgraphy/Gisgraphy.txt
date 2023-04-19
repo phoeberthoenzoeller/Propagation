@@ -1,0 +1,15 @@
+Gisgraphy is a free, open source framework that offers the possibility to do geolocalisation and geocoding 
+via Java APIs or REST webservices. Because geocoding is nothing without data, it provides an easy to use 
+importer that will automagically download and import the necessary (free) data to your local database 
+(Geonames and OpenStreetMap : 42 million entries). 
+You can also add your own data with the Web interface or the importer connectors provided. 
+Gisgraphy is production ready, and has been designed to be scalable(load balanced), 
+performant and used in other languages than just java : results can be output in XML, JSON, PHP, Python, 
+Ruby, YAML, GeoRSS, and Atom. One of the most popular GPS tracking System (OpenGTS) also includes a 
+Gisgraphy client...an android library is also provided
+
+URL: https://www.gisgraphy.com/index.php
+
+Offline or hosted web service.
+
+Business model is selling data.

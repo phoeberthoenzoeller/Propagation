@@ -1,0 +1,4 @@
+It appears that geotools is a project of OSGeo.org
+https://www.osgeo.org/projects/geotools/
+An open source Java library providing a standards compliant approach for visualization and processing of 
+geospatial data and web services using data structures based on Open Geospatial Consortium (OGC) specifications.

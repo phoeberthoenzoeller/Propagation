@@ -1,0 +1,18 @@
+
+/**
+ * The purpose of this class is to populate callmaid.cq and callmaid.itu given callmaid.state, callmaid.country, callmaid.zipcode.
+ * It operates exclusively on country="US" records because it relies on state and zipcode.
+ * Table zipcodegeo provides link from zipcode to lat/lon.
+ * This is performed after PopulateCallmaidMaidenhead.java which populates the maidenhead.
+ * 1) Get all callmaid records with (null ITU or null CQ) and country = "US".  
+ * 2) If callmaid.cq or itu is not null then return to 1)
+ * 3) Read callmaid.zipcode, state, country, callsign, maidenhead.
+ * 4) Call USStateToCQITU(state,zippy,callsign,maidenhead) to obtain cq and itu.
+      This method uses the state prefix to determine cq and itu.
+      In the case of states within two CQ or ITU zones then CallmaidUtils.queryZipcodegeo(zipcode,callsign) is called to obtain the lat/lon.
+      This method queries table zipcodegeo for the zipcode and returns a lat/lon if found.
+      The longitude within the state determines the zone.
+ * 5) Update callmaid.cq and callmaid.itu.
+ * Invoked from UIMain.jMenuItemPopCallmaidActionPerformed().
+
+CQ zones are numbered 1 to 32.  ITU zones are 1 to 89.

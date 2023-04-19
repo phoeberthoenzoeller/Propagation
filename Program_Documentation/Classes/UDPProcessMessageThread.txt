@@ -1,0 +1,38 @@
+Thread UDPProcessMessageThread is a state machine instantiated by UDPThreadManager.
+The constructor passes the Vector object that is shared with UDPServerWorker.
+Vector bufferVector holds ojects of MessageRecord.
+
+The following elaborates on each state of the machine::
+  case 0: Initialize.  Create PopulateAlltxt. 
+         Method processMessageRecord is used in state=20.  
+         goto state=10;
+
+  case 10: Get MessageRecord from Vector bufferVector.
+         If there are no MessageRecord objects in Vector then wait 10 seconds and return to state 10.
+         else get the first MessageRecord from bufferVector and goto state 20.
+      
+  case 20:  Process MessageRecord.
+         if messageType != 11(uncategorized message) and messageType != 10(null message)
+         then call PopulateAlltxt.processMessageRecord.  This method accepts a MessageRecord, 
+         processes it as described in PopulateAlltxt.  Included in that processing is creation
+         of a CALLMAID record for the source callsign in the message if it does not already exist therein.
+         PopulateAlltxt.writeToDatabase() writes MessageRecord to Alltxt table.
+         If the qthrealtime flag is true and PopulateAlltxt.callcreateflag is true then goto state 25,
+         else state 30.
+      
+  case 25:  Query HamQTH
+         Call PopulateCallmaidHamQTH.hamqthToCallmaid(callsign). This queries the hamqth API,
+         and updates callmaid with data from API response. More specifically:
+         1) For the record in callmaid matching (callsign)
+         2) creates a new CallmaidRecord,
+         3) create a HamQTH.hamqthEntity object from a Get from HamQTH, parse the XML, assign to hamqthEntitry, return the hamqthEntity object.
+         4) Update callmaid record with data from HamQTH.hamqthEntity object.
+         If hamqthToCallmaid() fails to query the hamqth api then execute
+         QRZCQ.QRZCQToCallmaid(callsign) which will query qrzcq.com for the callsign and populate callmaid with result.
+         Goto state=30.
+      
+    case 30: Delete bufferVector record, goto state=10.
+            
+    case 90: Error restart, goto state=0.
+     
+    State 100 is termination state.

@@ -1,0 +1,7 @@
+From UIMain menu item Propagation/Plot Parameters(jMenuItemPlotParameters)creates new PlotParameters.
+Therein the user specifies Alltxt search parameters.
+Pressing the Plot button (jButtonPlot) invokes method plotData().
+plotData() queries the Alltxt table and call createPlot().
+createPlot() creates new ContactsPolarChart. It adds six datasets
+to the plot for differing RSSI values.
+ContactsPolarChart is modeled after PolarChart.

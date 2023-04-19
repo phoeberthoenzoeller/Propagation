@@ -1,0 +1,39 @@
+Read All.txt: Read the All.txt log file produced by WSJTX.  Parse it, write to ALLTXT table.
+Write new callsigns to CALLMAID table.
+UIMain. jMenuItemReadAlltxtActionPerformed(). New ReadWSJTXFile(Common.wsjtxFile).
+Constructor creates supporting objects and opens the file.
+
+UIMain calls parseFile(null).  Reads all ALL.TXT records via this.readFileList() into List.
+String array is created from List.
+Iterate through array calling this.parseFields() for each record.
+parseFields() produces a MessageRecord which is then passed to this.processMessageRecord().
+Finally the MessageRecord is written to ALLTXT table by this.writeToDatabase().
+
+
+processMessageRecord().
+If maidenhead is not included in the message then the maidenhead is derived from the callsign
+in this.maidFromCallsign().
+createUpdateCallmaid is called to create or update callmaid record.
+If sourceMaidenhead is assigned then calculate bearing and distance to home QTH.
+
+
+maidFromCallsign().
+The goal here is to obtain the maidenheads of the caller callsign and respondent callsign when it is not obtained from the message.
+Then assign sourceMaiden from either callerMaiden or respondentMaiden depending on value of sourceIs.
+If callerCallsign is populated and callerMaiden is not; i.e.
+if(atrl.sourceMaidenhead==null && atrl.sourceCallsign != null && !atrl.sourceCallsign.equals("") && !atrl.sourceCallsign.equals("..."))
+then obtain sourceMaiden from CALLMAID via sourceCallsign.  
+If CALLMAID does not provide sourceMaiden then get lat/lon from sourceCallsign and use this to obtain sourceMaiden.
+sourceIsCaller is true when sourceCallsign is callerCallsign, false when sourceCallsign is respondentCallsign.
+Return prefixMaiden which indicates whether the maidenhead was assigned from source callsign prefix.
+First we populate, if necessary, callerMaiden.
+If callerMaiden was not assigned in AlltxtRecord.decode() then look it up in table callmaid from callerCallsign.
+If that fails then get a an approximate maidenhead from the callsign prefix.
+prefixMaiden is true if maidenhead was assigned from source callsign prefix.d
+
+createUpdateCallmaid().
+If there is no callmaid record then create it.  
+If there is a callmaid then update it if prefixMaiden=false.
+prefixMaiden is true if maidenhead was assigned from callsign prefix.
+The assumption is that the licensee provided maidenhead preponderates over that provided by the 
+FCC database or approximation from country code.

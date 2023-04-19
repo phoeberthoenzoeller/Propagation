@@ -1,0 +1,26 @@
+#properties file written
+#Fri Oct 21 20:51:33 CDT 2022
+zipcodeFile=zip_code_base.csv
+logfile=autoGen
+homeQTH=EM74di16
+# DBType is MariaDB or Derby_res
+DBType=Derby_res
+entityFile=EN.dat
+
+#DBServer is null for Derby_res
+#DBServer=192.168.222.163
+DBServer=""
+
+# DBPassword is null for Derby
+#DBPassword=P@sswd4MySQL\!
+columnSelections=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20
+wsjtxFile=ALL.TXT
+debugFlag=true
+callsign=KM4SDB
+
+#DBName=propagation
+DBName=database\\Propagation
+
+# DBUsername is null for Derby
+#DBUsername=root
+autodelete=7

@@ -1,0 +1,10 @@
+Main menu log query.  In general the variables entered constrain cumulatively the query executed.
+Remember that all queries are constrained to a maximum of queryrowlimit rows.
+Date range. Mandatory.  This anded with other variables.
+Mode. Optional. If mode is selected then it is anded with other variables.
+Message type. Optional. If message type is selected then it is anded with other variables.
+Caller callsign. Optional. If not null then callsign is anded with other variables.
+Respondent callsign. Optional.  If caller callsign was specified then it anded or ored to caller callsign.  Else it is anded to other variables.
+Source maidenhead. Optional. If specified then it is anded with other variables.
+Distance between transmitting callsign and QTH.  Specified in kilometers. Optional. +- is also in kilometers.
+Message. message content. Optional. Wildcards are appended to beginning and end of entered text.  Anded with other variables.

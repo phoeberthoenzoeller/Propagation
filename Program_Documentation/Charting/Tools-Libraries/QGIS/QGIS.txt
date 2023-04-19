@@ -1,0 +1,1 @@
+QGIS is standalone program into which you add GIS entities.

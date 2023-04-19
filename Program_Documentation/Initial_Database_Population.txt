@@ -1,0 +1,91 @@
+Admin/Read Entity File reads from file EN.dat or file specified in properties.txt name=entityFile
+The EN.dat file is about 200MB in size.  All of it read into memory as a List which is converted to a String[].
+For each line in the String[]:
+Parse and write to table callmaid as follows: 
+     callsign (field 5) to callsign
+	first name (field 9) to firstName
+	middle initial (field 10) to middleInitial
+	last name (field 11) to lastName
+	street address (field 16) to street
+	city (field 17) to city
+	state (field 18) to state
+	zip 	(field 19) to zipcode
+It is performed by UIMain. jMenuItemReadEntityFileActionPerformed(), ReadEntityFile().
+An existing callmaid record with matching callsign will be updated, else a new callmaid record is created.
+The Entity class is used to hold the data to be written to one record of callmaid.  It always populates "country" column with "US".
+If you have debugFlag set to true in properties.txt then the program
+will require many hours and over 10GB of log space.
+The EN.dat file contains many canceled callsigns.  There is not an obvious way to discern these given the data in EN.dat.
+
+
+Admin/Populate Callmaid US:  Note that population of table zipcodegeo is a prerequisite to this procedure.
+This option must be run after Admin/Read Entity File.
+Runs Admin.jMenuItemPopCallmaidActionPerformed() which invokes:
+a) PopulateCallmaidMaidenhead() to populate callmaid.maidenhead given callmaid.zipcode, and
+b) PopulateCallmaidCQITU() to populate callmaid cq and itu wherein cq and itu are not already populated and country = 'US'
+These are constrained by querylimit and memory.  If you have a modest computer then set querylimit to 200,000 and run several times.
+PopulateCallmaidMaidenhead: It populates callmaid.maidenhead.
+The purpose of this class is to populate callmaid.maidenhead given callmaid.zipcode which was provided from FCC database via UIMain.jMenuItemPopCallmaidActionPerformed
+Table zipcodegeo provides link from zipcode to lat/lon.
+The original callmaid table contents were loaded from EN.dat by class ReadEntityFile.
+1) Read each record from callmaid.
+2) If callmaid.maidenhead is not null then return to 1)
+3) Read callmaid.zipcode.
+4) Query zipcodegeo where zipcodegeo.zipcode = callmaid.zipcode. Get latitude and longitude
+5) If zipcodegeo not found then return to 1)
+6) Convert zipcodegeo.latitude/longitude to maidenhead using Maidenhead.latLonToMaiden()
+7) Update callmaid.maidenhead with result of latLonToMaiden()
+
+Admin/Read Zipcode File:
+* This class reads from free-zipcode-database.csv and populated table zipcodegeo
+ * Fields in free-zipcode-database.csv are:
+ * 1) Recordnumber: integer
+ * 2) zipcode: integer of length 5
+ * 3) zipcodetype: "STANDARD" or "PO BOX"
+ * 4) City: varchar 40
+ * 5) State: varchar 2
+ * 6) LocationType: "NOTACCEPTABLE", "PRIMARY"
+ * 7) Lat: float
+ * 8) Long: float
+ * 9) Xaxis: decimal unknown quantity
+ * 10) Yaxis: decimal unknown quantity
+ * 11) Zaxis: decimal unknown quantity
+ * 12) WorldRegion: "NA" presumably because this table is constrained to United States zipcodes
+ * 13) Country: "US"
+ * 14) LocationText: Usually the same as "city".
+ * 15) Location: varchar(2) state abbreviation (or possession e.g. "PR")
+ * 16) Decommisioned: varchar unknown quantity.
+ * 17) TaxReturnsFiled: varchar "false" or "true"
+ * 18) EstimatedPopulation: integer populated sparsely.
+ * 19) TotalWages: integer populated sparsely
+ * 20) Notes: refer to source of data
+ * 
+ * 
+ * File zip_code_base includes the following fields:
+ * 1) zip code
+ * 2) state: varchar(2)
+ * 3) state: varchar
+ * 4) city: varchar
+ * 5) latitude: float
+ * 6) longitude: float
+ * 7) countyfips:  Integer unique identifier of U.S. county
+ * 8) countyname: varchar of county
+ * 9) dominantareacode: predominant phone area code, 3 integer digits.
+ * 10) ziptype: "standard" or "P.O. Box zip code"
+ * 11) facilitycode: "P" or "N" ??
+ * 12) financenumber: 6 digit number ??
+ * 13) CBSAcode: 5 digit number, Core Based Statistical Area
+ * 14) DMANameCBSA: Text description of CBSA
+ * 15) CBSAStatus: type of CBSA
+ * 16) CBSADivision
+ * 17) CBSADivisionTitle
+ * 18) CBSADivisionStatus
+ * 19) Organization
+ * 20) TimeZone: varchar(3) 
+ * 21) TotalPopulation: integer
+ * 22) Age_MedianAge_Pop_Cnt: float median age
+ * 23) HouseValue_Median_OU_Cnt: integer dollars
+ * 24) Income_MedianFamilyIncome_Fam_Cnt: integer dollars
+ * 25) Sex_Female_Pop_Cnt: Integer number of females
+ * 26) Sex_Male_Pop_Cnt: Integer number of males
+Table zipcodegeo is used to provide a link between zipcode and lat/lon in class PopulateCallmaid.

@@ -1,0 +1,17 @@
+OpenMap is a Java Beans-based toolkit for building applications and applets needing 
+geographic information. Using OpenMap components, you can access data from legacy 
+applications, in-place, in a distributed setting. At its core, OpenMap is a set of 
+Swing components that understand geographic coordinates. These components help you 
+show map data, and help you handle user input events to manipulate that data.
+
+License: OpenMap.  Open source. trademark of BBN Corporation, part of Verizon.
+
+Version: 5.1.15 12/03/16
+
+Maintenance: Last update 7 years ago.
+
+Source: https://github.com/OpenMap-java/openmap
+
+URL: http://openmap-java.org/
+
+File support: Does support shapefiles.

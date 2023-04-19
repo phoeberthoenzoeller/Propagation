@@ -1,0 +1,10 @@
+JTS Topology Suite is an open-source Java software library that provides an object model for 
+Euclidean planar linear geometry together with a set of fundamental geometric functions. 
+JTS is primarily intended to be used as a core component of vector-based geomatics software 
+such as geographical information systems.
+
+Used in Geotools.
+
+Implemented Standards:
+    Open Geospatial Consortium (OGC)
+    Well-Known Binary (WKB)

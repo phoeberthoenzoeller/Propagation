@@ -1,0 +1,34 @@
+Aspose: is a commercial closed source GIS written in C# for .NET
+
+Geotools:
+Deals with shapefiles.
+Maven build tool.
+Actively developed.  
+Utilizes Java Topology Suite
+As of 04/10/23 trying to get through Quickstart tutorial and stuck in dependency hell.
+See project geotools.
+
+*OpenMap: 
+Supports shapefiles.
+Last update: 7 years ago.
+I looked over Tutorial Part 1 on 04/17/23 and was impressed the tutorial.  It utilizes Swing in a manner familiar to me.
+
+OpenJump: A desktop program for creation of maps.  It appears less useful for integration into an existing application.
+Supports: shapefiles, simple GML files, other vector files.
+Dependencies: JTS
+Development: Last stable release 12/2022
+
+
+Geoxygene: OGC/ISO
+Development: 6 years ago.
+Documentation is all in French.
+
+uDig: Failed to run.
+
+NMapBrowser:  Appears to now be closed source commercial.
+
+GeoGoogle: Online free address geocoder.
+
+Gisgraphy: 
+
+JGeocoder: Geocoder only.  No presentation layer.

@@ -1,0 +1,9 @@
+Java address standardization API that utilizes google's geocoding service. 
+It parses an input address, sends it to google geocode service via http 
+and then parses the return result into an address object. 
+You get a free geocoding service thanks to google.
+This is an online resource.
+
+URL: https://geo-google.sourceforge.net/
+
+Limit is 15k per day.

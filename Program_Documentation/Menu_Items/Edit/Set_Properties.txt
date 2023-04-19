@@ -1,0 +1,1 @@
+Reads and updates text file properties.txt.

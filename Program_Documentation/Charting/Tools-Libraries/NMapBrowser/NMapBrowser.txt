@@ -1,0 +1,18 @@
+NMapBrowser is a browser opening the view of maps in format MapInfo. 
+Features: 
+  * Support MultiLayer map 
+  * Multiplatform (Windows, Linux, MacOS, Solaris) 
+  * Fast draw map. 
+  * Support of all .tab, .map, .dat formats. 
+  * Support map R-Tree index. 
+  * ZoomIn/ZoomOut/Pan map tools. 
+  * Drawing main objects of MapInfo. 
+  * Support of different style lines. 
+  * Save map WorkSpace parameters. 
+  * Drawing the map labels. 
+  * Small size and compact. 
+  * Support Mapinfo data file. 
+  * Save geoset parameters on XML. 
+  * Support MultiLanguage encoding. 
+
+It appears that this product is now closed source commercial.

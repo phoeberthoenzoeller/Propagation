@@ -1,0 +1,54 @@
+This is a summary of the methods in class ReadWSJTXFile.java.
+
+
+Constructor(String filename):
+Open the specified filename.  If it doesn't exist then solicit file from user.
+User Maidenhead.maidenheadToLatLon(Common.homeQTH) to assign this.latHome and this.lonHome.
+
+List<String> readFileList():
+Read entire ALL.TXT(or user specified file) into List.
+Called exclusively by this.parseFile()
+
+boolean parseFile(String callsign):
+Called by UIMain
+Read each line of ALL.TXT, parse into fields.
+callsign is Common.callsign.  If not null then read of ALL.TXT is constrained to records of user callsign.
+If called with callsign then read only those ALL.TXT records containing that callsign.
+If called with null callsign then read all ALL.TXT records.
+1) Calls this.readFileList() which returns List<String> which is converted to String[] lineArray.
+2) For each lineArray:
+3) Call this.parseFields(lineArray[x]) to parse data.  See below.  Assign result to AllTxtRecord atrec.
+  if atrec is null then continue with next record in lineArray[].
+4) Call maidFromCallsign(AllTxtRecord).
+
+ 
+
+
+3) AllTxtRecord parseFields(String line):
+a) Read each field from tokenized line of All.txt.  
+  If value is not valid then return null.
+  Use this.parseDateTime() for ldt.
+b) Using the parsed fields create the AllTxtRecord object.
+  Call AllTxtRecord.decodeMessage().  If return value is null then return incomplete record.
+
+
+4) maidFromCallsign(AllTxtRecord)
+a) First we populate, if necessary, callerMaiden.
+   If callerMaiden was not assigned in AlltxtRecord.decode() then look it up in table callmaid from callerCallsign.
+   If that fails then get a an approximate maidenhead from the callsign prefix.
+   prefixMaiden is true if maidenhead was assigned from source callsign prefix.d
+b) Next we populate, if necessary, respondentMaiden.
+   If respondentMaiden was not assigned in AlltxtRecord.decode() then look it up in table callmaid from respondentCallsign.
+   If that fails then get a an approximate maidenhead from the callsign prefix.
+
+
+
+Counters:
+  this.decodeSuccessesTotal.(recordsprocessed). AllTxtRecord.decodeMessage() returned true.
+  this.totalRecords. lineArray.length.  Should equal lines in ALL.TXT text file.
+  this.decodeFailuresTotal.  AllTxtRecord.decodeMessage() returned false.
+  this.sourceMaidenheadTotal. atrec.sourceMaidenhead != null.
+  this.databaseWrites. prodb.submitAlltxtDatabase(atrec) returned true.
+  this.databaseWriteFailures.  prodb.submitAlltxtDatabase(atrec) returned false.
+  this.prodb.duplicates.   Number of times that submit failed owing to duplicate primary key
+  this.nonFT84Total.. Mode field is not "FT8" or "FT4".

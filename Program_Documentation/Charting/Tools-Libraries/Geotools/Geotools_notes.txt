@@ -1,0 +1,7 @@
+Deals with shapefiles.
+Maven build tool.
+Will add a huge repository to C:\Documents and Settings\You\.m2\repository
+Actively developed.  On 03/23/23 the last modification ins sourceforge was 03/03/23
+URL: https://geotools.org/
+
+Utilized Java Topology Suite

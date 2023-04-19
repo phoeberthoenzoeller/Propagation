@@ -1,0 +1,37 @@
+Methods calculate bearing and distance.
+
+Navigation.initialBearing(lat,lon,lat,lon
+  called by this.calculateBearingDistance()
+  called by AlltxtUtils.calculateBearingDistance()
+  called by this.finalBearing()
+  called by this.calculateBearingDistance()
+
+Navigation.finalBearing(lat,lon,lat,lon)      // finalbearing is not stored in the database.
+  called by AlltxtUtils.calculateBearingDistance() 
+
+Navigation.calculateBearingDistance(double[] lat, double[] lon)
+  utilizes this.distanceBetween()
+  utilizes this.initialBearing()
+  Not currently utilized.
+
+Navigation.distanceBetween(lat,lon,lat,lon)
+  called by this.calculateBearingDistance() Not utilized.
+  called by AlltxtUtils.calculateBearingDistance()
+
+AlltxtUtils.calculateBearingDistance(MessageRecord, lat, lon)
+  utilizes Maidenhead.maidenheadToLatLon()
+  utilizes Prodbutils.callsignToLatLonDouble(callsign)
+  utilizes Navigation.distanceBetween()
+  utilizes Navigation.initialBearing()
+  utilizes Navigation.finalBearing()
+  called by PopulateAlltxt.processMessageRecord()
+
+
+Associated methods:
+double[] Maidenhead.maidenheadToLatlon(maidenhead)
+  Called by AlltxtUtils.calculateBearingDistance()
+  Called by PopulateAlltxt.constructor()
+  Called by PopulateCallmaidCQITU.USStateToCQITU
+  utilizes this.validityCheck(), this.fieldToLat(), this.fieldToLon()
+    this.squareToLat(), this.squareToLon(), 
+    this.extSquareToLat(), this.extSquareToLon(), this.reachedEnd()

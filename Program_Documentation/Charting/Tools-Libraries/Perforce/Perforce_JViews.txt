@@ -1,0 +1,3 @@
+JViews provides the industry's most comprehensive set of graphics tools for 
+creating sophisticated highly-interactive, highly-graphical, and 
+high-performance displays.

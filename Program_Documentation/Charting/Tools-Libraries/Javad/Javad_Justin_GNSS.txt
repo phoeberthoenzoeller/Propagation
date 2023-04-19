@@ -1,0 +1,8 @@
+Justin3 is a proprietary closed commercial package that costs $2500.
+Justin 3 is an enhanced version of well proven Justin software. As a predecessor it is 
+full featured professional tool for surveying, geodesy, aerial photography. 
+GIS style interface makes effortless post processing of GNSS data and project management. 
+The software discloses all advantages of JAVAD technology products and has been optimized 
+to deal the highest precision with least amount of operator invention. 
+It is the only desktop software version of DPOS (Data Post processing Online Service) 
+of JAVAD company. 

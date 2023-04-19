@@ -1,0 +1,57 @@
+Class overview:  Processes messages from WSJT-X and populates ALLTXT and CALLMAID tables.
+The messages may be from a text file ALL.TXT or from the WSJT-X UDP client.
+If from ALL.TXT then PopulateAlltxt is invoked from ReadWSJTXFile.java.
+If from UDP then PopulateAlltxt is invoked from UDPProcessMessageThread.java.
+The messages are made available via a Vector that is populated via UDPServerThread.java.
+
+Constructor:  Create Maidenhead(mhObj), AlltxtUtils(alltxtUtilObj) objects and initialize counters.
+
+MessageRecord createMessageRecord(fields from WSJTX message):
+  Called by: ReadWSJTXFile.parseFields(), UDPWSJTX.messageType2().
+  Overview:  Populate a MessageRecord object and call MessageRecord.decodeMessage().  
+  Detail:  
+    If mode not FT8 or FT4 then return null.
+    Create MessageRecord from this method's arguments, and call decodeMessage().
+    If decode Message() returns false then log error, but still return the MessageRecord.  
+    We want to populate ALLTXT even with messages that we don't understand.
+    Return the MessageRecord object.
+
+
+boolean processMessageRecord(MessageRecord):
+  Called by: ReadWSJTXFile.parseFile(), UDPProcessMessageThread state=20.
+  Overview: Populate ALLTXT maidenhead, sourcemaiden, bearing, distance. Populate callmaid country,  maidenhead.
+  Detail:
+    1) Call this.maidFromCallsign() to obtain the maidenhead from the source's callsign and assign to MessageRecord.
+       Returns boolean prefixMaiden indicating whether the maidenhead was assigned from source callsign prefix.
+       prefixMaiden is true if maidenhead was assigned from source callsign prefix. and is false if obtained if obtained from callmaid.
+    2) Call Propdbutils.callsignToCountrycode() to obtain country from callsign.
+    3) Call this.createUpdateCallmaid() to: 
+       a) If sourceCallsign or sourceMaidenhead are null then return without action.
+       b) If there is no callmaid record then create it.  
+       c) If there is a callmaid then update it if prefixMaiden=false.
+          prefixMaiden is true if maidenhead was assigned from callsign prefix.
+          The assumption is that the licensee provided maidenhead preponderates over that provided by the FCC database or approximation from country code.
+    4) Call createUpdateCallmaid() to populate callmaid with callsign and maidenhead.
+    5) Call AlltxtUtils.calculateBearingDistance() to assign bearing and distance in ALLTXT record.
+
+
+
+private int maidFromCallsign(MessageRecord)
+Called by: this.processMessageRecord().
+The goal here is to obtain the maidenheads of the caller callsign and respondent callsign when it is not obtained from the message.
+Then assign sourceMaiden from either callerMaiden or respondentMaiden depending on value of sourceIs.
+All in four easy steps:
+1) If callerCallsign is populated and callerMaiden is not
+  then obtain callerMaiden from CALLMAID via callerCallsign.  
+  If CALLMAID does not provide callerMaiden then get lat/lon from callerCallsign and use this to obtain callerMaiden.
+2) Similarly for respondentMaiden:
+  If respondentCallsign is populated and respondentMaiden is not
+  then obtain respondentMaiden from CALLMAID via respondentCallsign.  
+  If CALLMAID does not provide respondentMaiden then get lat/lon from respondentCallsign and use this to obtain respondentMaiden.
+3) Assign sourceMaidenhead based on sourceIs flag.
+  If sourceIs=="C" then sourceCallsign/maidenhead is callerCallsign/maidenhead.
+  If sourceIs=="R" then sourceCallsign/maidenhead is respondentCallsign/maidenhead. 
+4) Return int prefixMaiden which is:
+ *   (1) if source.maidenhead was assigned from source callsign prefix.  Least authoritative.  Never update existing callmaid record.  Create if not extant.
+ *   (2) if source.maidenhead was assigned from CALLMAID then there is no reason to rewrite it.  No update or create.
+ *   (3) if assigned from WSJTX message. Most authoritative.  Always update existing callmaid record.
